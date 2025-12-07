@@ -24,6 +24,9 @@ dependencies {
     // Starter para desenvolver APIs REST
 	implementation("org.springframework.boot:spring-boot-starter-web")
 
+    // Starter de Spring Validator (Jakarta + Hibernate)
+    implementation("org.springframework.boot:spring-boot-starter-validation")
+
     // Suporte a JSON com Kotlin (JACKSON)
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 

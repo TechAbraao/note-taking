@@ -1,7 +1,8 @@
 package dev.himanshu.noteTaking.controllers
 
-import dev.himanshu.noteTaking.models.Note
+import dev.himanshu.noteTaking.dto.NoteRequest
 import dev.himanshu.noteTaking.services.NoteServices
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,9 +17,9 @@ class NoteController (
 private val noteServices: NoteServices
 ) {
     @GetMapping("/api/notes")
-    fun getNotes() : ResponseEntity<List<Note>> {
+    fun getNotes() : ResponseEntity<List<NoteRequest>> {
 
-        val notes: List<Note> = noteServices.getNotes()
+        val notes: List<NoteRequest> = noteServices.getNotes()
         if (notes.isEmpty()) {
             return ResponseEntity(HttpStatus.NOT_FOUND)
         }
@@ -29,14 +30,14 @@ private val noteServices: NoteServices
     }
 
     @GetMapping("/api/notes/{id}")
-    fun getNoteById(@PathVariable("id") id: UUID) : ResponseEntity<Note> {
-        val note: Note = noteServices.getNoteById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND);
+    fun getNoteById(@PathVariable("id") id: UUID) : ResponseEntity<NoteRequest> {
+        val note: NoteRequest = noteServices.getNoteById(id) ?: return ResponseEntity(HttpStatus.NOT_FOUND);
         return ResponseEntity.ok(note)
     };
 
     @PostMapping("/api/notes")
-    fun postNotes(@RequestBody note: Note): ResponseEntity<Note> {
-        noteServices.postNote(note);
+    fun postNotes(@Valid @RequestBody note: NoteRequest): ResponseEntity<NoteRequest> {
+        noteServices.postNote(note)
         return ResponseEntity
             .status(201)
             .body(note);
