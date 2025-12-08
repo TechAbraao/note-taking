@@ -21,22 +21,28 @@ repositories {
 
 // Aqui você adiciona os Starters do Spring Boot
 dependencies {
-    // Starter para desenvolver APIs REST
-	implementation("org.springframework.boot:spring-boot-starter-web")
+    // APIs REST
+    implementation("org.springframework.boot:spring-boot-starter-web")
 
-    // Starter de Spring Validator (Jakarta + Hibernate)
+    // JPA + Hibernate (necessário para datasource, entity manager, etc.)
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    // Driver do PostgreSQL
+    runtimeOnly("org.postgresql:postgresql")
+
+    // Validação (Jakarta + Hibernate Validator)
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
-    // Suporte a JSON com Kotlin (JACKSON)
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    // JSON + Kotlin
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-    // Reflexão do Kotlin (necessário pro Spring gerenciar beans Kotlin)
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
+    // Reflexão do Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-    // Dependências para testes
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // Testes
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 kotlin {

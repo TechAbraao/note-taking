@@ -1,6 +1,6 @@
 COMPOSE_DIR := compose
-COMPOSE_FILE := docker/$(COMPOSE_DIR)/docker-compose.yml
-ENV_FILE := source/docker/$(COMPOSE_DIR)/.env
+COMPOSE_FILE := ./docker/$(COMPOSE_DIR)/docker-compose.yml
+ENV_FILE := ./docker/$(COMPOSE_DIR)/.env
 PROJECT_NAME := note-taking
 
 up:
