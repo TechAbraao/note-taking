@@ -4,6 +4,7 @@ import dev.himanshu.noteTaking.dto.NoteDTO
 import dev.himanshu.noteTaking.dto.NoteRequest
 import dev.himanshu.noteTaking.entities.NoteEntity
 import dev.himanshu.noteTaking.services.NoteServices
+import dev.himanshu.noteTaking.utils.ApiResponse
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,57 +21,126 @@ import java.util.UUID
 
 @RestController
 @RequestMapping("/api/notes")
-class NoteController (
+class NoteController(
     private val noteServices: NoteServices
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     @GetMapping
-    fun getAllNotes() : ResponseEntity<List<NoteDTO>> {
-        val allNotes: List<NoteDTO> = noteServices.getAllNotes()
+    fun getAllNotes(): ResponseEntity<ApiResponse<List<NoteDTO>>> {
+        val allNotes: List<NoteDTO> = noteServices.all()
 
         if (allNotes.isEmpty()) {
-            return ResponseEntity(HttpStatus.NO_CONTENT)
+            return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .body(
+                    ApiResponse(
+                        statusCode = HttpStatus.NO_CONTENT.value(),
+                        message = "Lista de notas não encontradas.",
+                    )
+                )
         }
 
         return ResponseEntity
-            .ok(allNotes)
+            .status(HttpStatus.OK)
+            .body(
+                ApiResponse(
+                    statusCode = HttpStatus.OK.value(),
+                    message = "Todas as notas encontradas com sucesso.",
+                    data = allNotes
+                )
+            )
     }
 
     @GetMapping("{id}")
-    fun getNoteById(@PathVariable("id") id: UUID) : ResponseEntity<NoteDTO> {
-        val note: NoteDTO = noteServices.getNoteById(id = id)
-            ?: return ResponseEntity.notFound().build()
-        return ResponseEntity.ok(note)
+    fun getNoteById(@PathVariable("id") id: UUID): ResponseEntity<ApiResponse<NoteDTO>> {
+        val note: NoteDTO = noteServices.findById(id = id)
+            ?: return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(
+                    ApiResponse(
+                        statusCode = HttpStatus.NOT_FOUND.value(),
+                        message = "Nota não encontrada.",
+                    )
+                )
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(
+                ApiResponse(
+                    statusCode = HttpStatus.OK.value(),
+                    message = "Nota encontrada com sucesso.",
+                    data = note
+                )
+            )
     }
 
     @PostMapping
-    fun postNote(@Valid @RequestBody request: NoteRequest): ResponseEntity<NoteRequest> {
-        val createdNote: NoteDTO = noteServices.postNote(request)
+    fun postNote(@Valid @RequestBody request: NoteRequest): ResponseEntity<ApiResponse<NoteDTO>> {
+        /**
+         *
+         * Regras de Negócio:
+         *
+         * (1) Impede a criação de notas com títulos duplicados. Caso um título igual já exista no banco, a nota não deve ser criada.
+         *
+         * (2) ...
+         */
+        val createdNote: NoteDTO = noteServices.create(request) ?: return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(
+                ApiResponse(
+                    statusCode = HttpStatus.BAD_REQUEST.value(),
+                    message = "Tìtulo duplicado, insira um título válido."
+                )
+            )
+
         return ResponseEntity
             .status(HttpStatus.CREATED)
-            .body(request)
+            .body(
+                ApiResponse(
+                    statusCode = HttpStatus.CREATED.value(),
+                    message = "Nota criada com sucesso.",
+                    data = createdNote
+                )
+            )
     }
 
     @DeleteMapping("{id}")
-    fun deleteNote(@PathVariable id: UUID): ResponseEntity<Void> {
-        val deleted = noteServices.deleteNote(id)
+    fun deleteNote(@PathVariable id: UUID): ResponseEntity<ApiResponse<Unit>> {
+        val deleted = noteServices.deleteById(id)
 
         return if (deleted)
-            ResponseEntity.noContent().build()
+            ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .build()
         else
-            ResponseEntity.notFound().build()
+            ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse(
+                    statusCode = HttpStatus.NOT_FOUND.value(),
+                    message = "Nota não encontrada."
+                ))
     }
 
     @PutMapping("{id}")
     fun updateNote(
         @PathVariable id: UUID,
         @RequestBody request: NoteRequest
-    ): ResponseEntity<NoteDTO> {
+    ): ResponseEntity<ApiResponse<NoteDTO>> {
 
-        val updated = noteServices.updateNote(id, request)
-            ?: return ResponseEntity.notFound().build()
+        val updated = noteServices.update(id, request)
+            ?: return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ApiResponse(
+                    statusCode = HttpStatus.NOT_FOUND.value(),
+                    message = "Nenhuma nota alterada."
+                ))
 
-        return ResponseEntity.ok(updated)
+        return ResponseEntity.status(HttpStatus.OK)
+            .body(ApiResponse(
+                statusCode = HttpStatus.OK.value(),
+                message = "Nota alterada com sucesso.",
+                data = updated
+            ))
     }
 }

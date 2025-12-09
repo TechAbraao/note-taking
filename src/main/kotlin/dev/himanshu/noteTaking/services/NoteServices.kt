@@ -12,7 +12,7 @@ import java.util.UUID
 class NoteServices(val noteRepository: NoteRepository) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
-    fun getAllNotes(): List<NoteDTO> {
+    fun all(): List<NoteDTO> {
         logger.info("Retornando todas as notas.")
         return noteRepository.findAll().map { note ->
             NoteDTO(
@@ -23,7 +23,11 @@ class NoteServices(val noteRepository: NoteRepository) {
         }
     }
 
-    fun postNote(dto: NoteRequest): NoteDTO {
+    fun create(dto: NoteRequest): NoteDTO? {
+        if (noteRepository.findByTitle(dto.title) != null) {
+            return null
+        }
+
         val noteSaved: NoteEntity = noteRepository.save(dto.toEntity())
 
         return NoteDTO(
@@ -33,7 +37,7 @@ class NoteServices(val noteRepository: NoteRepository) {
         )
     }
 
-    fun deleteNote(id: UUID): Boolean {
+    fun deleteById(id: UUID): Boolean {
         return if (noteRepository.existsById(id)) {
             noteRepository.deleteById(id)
             logger.info("Nota $id removida com sucesso.")
@@ -44,7 +48,7 @@ class NoteServices(val noteRepository: NoteRepository) {
         }
     }
 
-    fun getNoteById(id: UUID) : NoteDTO? {
+    fun findById(id: UUID) : NoteDTO? {
         logger.info("Retornando nota com ID: '$id'.")
         val note = noteRepository.findByIdOrNull(id) ?: return null
         val noteDTO = NoteDTO(
@@ -57,7 +61,7 @@ class NoteServices(val noteRepository: NoteRepository) {
         return noteDTO
     }
 
-    fun updateNote(id: UUID, request: NoteRequest): NoteDTO? {
+    fun update(id: UUID, request: NoteRequest): NoteDTO? {
         val entity = noteRepository.findByIdOrNull(id) ?: return null
 
         val updatedEntity = entity.copy(
@@ -73,4 +77,5 @@ class NoteServices(val noteRepository: NoteRepository) {
             description = saved.description
         )
     }
+
 }
