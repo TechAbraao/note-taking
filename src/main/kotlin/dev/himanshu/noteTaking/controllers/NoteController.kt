@@ -1,7 +1,7 @@
 package dev.himanshu.noteTaking.controllers
 
 import dev.himanshu.noteTaking.dto.NoteDTO
-import dev.himanshu.noteTaking.dto.NoteRequest
+import dev.himanshu.noteTaking.dto.request.NoteRequest
 import dev.himanshu.noteTaking.entities.NoteEntity
 import dev.himanshu.noteTaking.services.NoteServices
 import dev.himanshu.noteTaking.utils.ApiResponse
@@ -77,14 +77,6 @@ class NoteController(
 
     @PostMapping
     fun postNote(@Valid @RequestBody request: NoteRequest): ResponseEntity<ApiResponse<NoteDTO>> {
-        /**
-         *
-         * Regras de Negócio:
-         *
-         * (1) Impede a criação de notas com títulos duplicados. Caso um título igual já exista no banco, a nota não deve ser criada.
-         *
-         * (2) ...
-         */
         val createdNote: NoteDTO = noteServices.create(request) ?: return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(

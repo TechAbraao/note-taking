@@ -5,4 +5,5 @@ import java.util.UUID
 
 interface NoteRepository : JpaRepository<NoteEntity, UUID> {
     fun findByTitle(title: String): NoteEntity?
+    fun existsByTitle(title: String): Boolean
 }

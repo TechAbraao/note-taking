@@ -1,6 +1,10 @@
-package dev.himanshu.noteTaking.dto
+package dev.himanshu.noteTaking.dto.request
+
+import dev.himanshu.noteTaking.dto.NoteDTO
 import dev.himanshu.noteTaking.entities.NoteEntity
+import dev.himanshu.noteTaking.utils.Priority
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.util.UUID
 
 data class NoteRequest(
@@ -11,10 +15,18 @@ data class NoteRequest(
 
     @field:NotBlank(message = "The field cannot be empty.")
     val description: String,
-) {
+
+    @field:NotNull(message = "Priority cannot be null.")
+    val priority: Priority,
+
+    @field:NotNull(message = "Field list cannot be empty.")
+    val tags: List<String>,
+
+    ) {
     fun toEntity(): NoteEntity = NoteEntity(
         title = title,
-        description = description
+        description = description,
+        priority = priority
     )
 
     fun toDTO(noteEntity: NoteEntity): NoteDTO {
@@ -22,6 +34,7 @@ data class NoteRequest(
             id = noteEntity.id,
             title = noteEntity.title,
             description = noteEntity.description,
+            priority = noteEntity.priority
         )
     }
 }

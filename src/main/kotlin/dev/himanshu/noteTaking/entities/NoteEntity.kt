@@ -1,4 +1,5 @@
 package dev.himanshu.noteTaking.entities
+import dev.himanshu.noteTaking.utils.Priority
 import jakarta.persistence.*
 import jakarta.validation.constraints.Size
 import org.springframework.data.annotation.CreatedDate
@@ -21,15 +22,23 @@ data class NoteEntity(
     @field:Size(max = 20)
     val title: String = "",
 
-    @field:Size(max = 100)
-    @Column(nullable = false)
+    @field:Size(max = 100) @Column(nullable = false)
     val description: String = "",
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false) @Enumerated(EnumType.STRING)
+    val priority: Priority = Priority.MEDIUM,
+
+    @ManyToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE])
+    @JoinTable(
+        name = "notes_tags",
+        joinColumns = [JoinColumn(name = "note_id")],
+        inverseJoinColumns = [JoinColumn(name = "tag_id")]
+    )
+    val tags: MutableList<TagEntity> = mutableListOf(),
+
+    @CreatedDate @Column(nullable = false, updatable = false)
     var createdAt: LocalDateTime? = null,
 
-    @LastModifiedDate
-    @Column(nullable = false)
+    @LastModifiedDate @Column(nullable = false)
     var updatedAt: LocalDateTime? = null
 )
