@@ -5,9 +5,11 @@ import dev.himanshu.noteTaking.dto.request.TagRequest
 import dev.himanshu.noteTaking.services.TagServices
 import dev.himanshu.noteTaking.utils.ApiResponse
 import jakarta.validation.Valid
+import org.apache.coyote.Response
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -20,34 +22,51 @@ import java.util.UUID
 class TagController(
     private val tagServices: TagServices
 ) {
+    @GetMapping
+    fun getAll(): ResponseEntity<ApiResponse<List<TagDTO>>> {
+        val listAllTags = tagServices.allTags()
+
+        return ResponseEntity
+            .status(HttpStatus.OK)
+            .body(ApiResponse(
+                message = "All tags were successfully returned.",
+                statusCode = HttpStatus.OK.value(),
+                data = listAllTags
+            ))
+    }
+
     @PostMapping
     fun postTag(@Valid @RequestBody request: TagRequest): ResponseEntity<ApiResponse<TagDTO>> {
-        var saved = tagServices.create(request = request)
+        val savedTag = tagServices.create(request = request)
         return ResponseEntity
             .status(HttpStatus.CREATED)
             .body(
                 ApiResponse(
-                    message = "Tag criada com sucesso.",
-                    statusCode = HttpStatus.CREATED.value()
+                    message = "Tag created successfully.",
+                    statusCode = HttpStatus.CREATED.value(),
+                    data = savedTag
                 )
             )
     }
 
     @DeleteMapping("{name}")
-    fun deleteByName(@PathVariable name: String): ResponseEntity<ApiResponse<Boolean>> {
+    fun deleteByName(@PathVariable name: String): ResponseEntity<ApiResponse<Unit>> {
+        val tagDeletedByName = tagServices.deleteByName(name)
 
-        return ResponseEntity
-            .status(HttpStatus.NO_CONTENT)
-            .body(
+        if (!tagDeletedByName) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ApiResponse(
-                    message = "Tag cannot be deleted",
-                    statusCode = HttpStatus.NO_CONTENT.value()
+                    message = "Error deleting tag.",
+                    statusCode = HttpStatus.BAD_REQUEST.value()
                 )
             )
-    }
+        }
 
-    @DeleteMapping("{id}")
-    fun deleteById(@PathVariable id: UUID): ResponseEntity<ApiResponse<Boolean>> {
-        TODO(reason = "Not implemented yet.")
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(
+            ApiResponse(
+                message = "Tag cannot be deleted.",
+                statusCode = HttpStatus.NO_CONTENT.value()
+            )
+        )
     }
 }

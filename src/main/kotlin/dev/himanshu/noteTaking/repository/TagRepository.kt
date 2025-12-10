@@ -9,4 +9,5 @@ import java.util.UUID
 interface TagRepository : JpaRepository<TagEntity, UUID> {
     fun findByName(name: String): TagEntity?
     fun existsByName(name: String): Boolean
+    fun deleteByName(name: String)
 }
