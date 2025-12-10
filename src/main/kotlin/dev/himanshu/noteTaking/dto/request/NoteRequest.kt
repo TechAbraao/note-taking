@@ -5,6 +5,7 @@ import dev.himanshu.noteTaking.entities.NoteEntity
 import dev.himanshu.noteTaking.utils.Priority
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Size
 import java.util.UUID
 
 data class NoteRequest(
@@ -19,7 +20,7 @@ data class NoteRequest(
     @field:NotNull(message = "Priority cannot be null.")
     val priority: Priority,
 
-    @field:NotNull(message = "Field list cannot be empty.")
+    @field:Size(min = 1, message = "Tags list cannot be empty.")
     val tags: List<String>,
 
     ) {
@@ -34,7 +35,8 @@ data class NoteRequest(
             id = noteEntity.id,
             title = noteEntity.title,
             description = noteEntity.description,
-            priority = noteEntity.priority
+            priority = noteEntity.priority,
+            tags = noteEntity.tags,
         )
     }
 }
