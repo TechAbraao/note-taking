@@ -29,7 +29,6 @@ data class NoteRequest(
         description = description,
         priority = priority
     )
-
     fun toDTO(noteEntity: NoteEntity): NoteDTO {
         return NoteDTO(
             id = noteEntity.id,

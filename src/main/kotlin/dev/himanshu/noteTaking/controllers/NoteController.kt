@@ -52,7 +52,7 @@ class NoteController(
             )
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     fun getNoteById(@PathVariable("id") id: UUID): ResponseEntity<ApiResponse<NoteDTO>> {
         val note: NoteDTO = noteServices.findById(id = id)
             ?: return ResponseEntity
@@ -91,13 +91,13 @@ class NoteController(
             .body(
                 ApiResponse(
                     statusCode = HttpStatus.CREATED.value(),
-                    message = "Nota criada com sucesso.",
+                    message = "Note created successfully.",
                     data = createdNote
                 )
             )
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     fun deleteNote(@PathVariable id: UUID): ResponseEntity<ApiResponse<Unit>> {
         val deleted = noteServices.deleteById(id)
 
@@ -114,7 +114,7 @@ class NoteController(
                 ))
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     fun updateNote(
         @PathVariable id: UUID,
         @RequestBody request: NoteRequest

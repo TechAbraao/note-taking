@@ -34,7 +34,7 @@ class TagEndpointsIntegrationTest @Autowired constructor(
         tagRepository.deleteAll()
     }
 
-    private fun createTag(name: String): ResultActions {
+    private fun performPostTags(name: String): ResultActions {
         val tagRequestCreation = TagRequest(name = name)
         return mockMvc.perform(
             post("/api/tags")
@@ -42,15 +42,14 @@ class TagEndpointsIntegrationTest @Autowired constructor(
                 .content(objectMapper.writeValueAsString(tagRequestCreation))
         )
     }
-
-    private fun returnTags(): ResultActions =
+    private fun performGetAllTags(): ResultActions =
         mockMvc.perform(get("/api/tags")
             .contentType(MediaType.APPLICATION_JSON)
         )
 
     @Test
     fun `Criar uma nova tag`() {
-        val tagCreated = createTag("TagTest").andExpect(status().isCreated)
+        val tagCreated = performPostTags("TagTest").andExpect(status().isCreated)
 
         tagCreated
             .andExpect(jsonPath("$.message").value("Tag created successfully."))
@@ -60,24 +59,31 @@ class TagEndpointsIntegrationTest @Autowired constructor(
 
     @Test
     fun `Retornar uma lista de todas as tags`() {
-        val request = returnTags().andExpect(status().isOk)
+        val request = performGetAllTags().andExpect(status().isOk)
+
         request
             .andExpect(
                 jsonPath("$.message")
                     .value("All tags were successfully returned.")
             )
-            .andExpect(jsonPath("$.statusCode").value(200))
+            .andExpect(
+                jsonPath("$.statusCode")
+                    .value(200)
+            )
 
         val responseBody = request.andReturn().response.contentAsString
         val response = objectMapper.readValue(responseBody, ApiResponse::class.java)
-        val tags: List<TagDTO> = objectMapper.convertValue(response.data, objectMapper.typeFactory.constructCollectionType(List::class.java, TagDTO::class.java))
+        val tags: List<TagDTO> = objectMapper.convertValue(
+            response.data,
+            objectMapper.typeFactory.constructCollectionType(List::class.java,
+                TagDTO::class.java))
 
         assertTrue(tags.all { it is TagDTO })
     }
 
     @Test
     fun `Deve converter o primeiro caractere da tag para maiúscula ao criar`() {
-        val tagCreated = createTag("tagtest").andExpect(status().isCreated)
+        val tagCreated = performPostTags("tagtest").andExpect(status().isCreated)
 
         tagCreated
             .andExpect(status().isCreated)
@@ -94,9 +100,9 @@ class TagEndpointsIntegrationTest @Autowired constructor(
     @Test
     fun `Deve retornar erro ao tentar criar tag duplicada`() {
         val tagName: String = "TagTest"
-        createTag(name = tagName).andExpect(status().isCreated)
+        performPostTags(name = tagName).andExpect(status().isCreated)
 
-        val tagCreated = createTag(tagName).andExpect(status().isConflict)
+        val tagCreated = performPostTags(tagName).andExpect(status().isConflict)
 
         tagCreated
             .andExpect(status().isConflict)

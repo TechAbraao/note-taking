@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -28,11 +29,13 @@ class TagController(
 
         return ResponseEntity
             .status(HttpStatus.OK)
-            .body(ApiResponse(
-                message = "All tags were successfully returned.",
-                statusCode = HttpStatus.OK.value(),
-                data = listAllTags
-            ))
+            .body(
+                ApiResponse(
+                    message = "All tags were successfully returned.",
+                    statusCode = HttpStatus.OK.value(),
+                    data = listAllTags
+                )
+            )
     }
 
     @PostMapping
@@ -49,7 +52,7 @@ class TagController(
             )
     }
 
-    @DeleteMapping("{name}")
+    @DeleteMapping("/{name}")
     fun deleteByName(@PathVariable name: String): ResponseEntity<ApiResponse<Unit>> {
         val tagDeletedByName = tagServices.deleteByName(name)
 
@@ -68,5 +71,10 @@ class TagController(
                 statusCode = HttpStatus.NO_CONTENT.value()
             )
         )
+    }
+
+    @PutMapping("/{name}")
+    fun changeTagByName(@PathVariable name: String): ResponseEntity<ApiResponse<Unit>> {
+        TODO(reason = "Not implemented yet.")
     }
 }

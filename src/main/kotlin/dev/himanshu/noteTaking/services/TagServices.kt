@@ -57,4 +57,8 @@ class TagServices (
         return allTags.map { TagMapper.toDTO(it) }
     }
 
+    @Transactional
+    fun changeByName(name: String) {
+        var formattedName = name.replaceFirstChar { it.uppercase() }
+    }
 }

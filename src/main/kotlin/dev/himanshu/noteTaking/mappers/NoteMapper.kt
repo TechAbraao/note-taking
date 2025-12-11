@@ -11,7 +11,6 @@ object NoteMapper {
             description = request.description,
             priority = request.priority
         )
-
     fun toDTO(entity: NoteEntity) =
         NoteDTO(
             id = entity.id,

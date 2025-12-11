@@ -10,7 +10,6 @@ object TagMapper {
             name = request.name,
         )
     }
-
     fun toDTO(entity: TagEntity): TagDTO {
         return TagDTO(
             id = entity.id,
