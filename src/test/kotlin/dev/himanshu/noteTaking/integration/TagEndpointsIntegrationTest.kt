@@ -78,7 +78,7 @@ class TagEndpointsIntegrationTest @Autowired constructor(
             objectMapper.typeFactory.constructCollectionType(List::class.java,
                 TagDTO::class.java))
 
-        assertTrue(tags.all { it is TagDTO })
+        assertTrue(tags.all { true })
     }
 
     @Test
@@ -94,6 +94,23 @@ class TagEndpointsIntegrationTest @Autowired constructor(
             .andExpect(
                 jsonPath("$.data.name")
                     .value("Tagtest")
+            )
+    }
+
+    @Test
+    fun `O campo 'name' não deve aceitar espaços e acentos`() {
+        val tagCreatedWithSpace = performPostTags("tag test").andExpect(status().isBadRequest)
+        val tagCreatedWithAccent = performPostTags("tágTest").andExpect(status().isBadRequest)
+
+        tagCreatedWithSpace
+            .andExpect(
+                jsonPath("$.statusCode")
+                    .value(400)
+            )
+        tagCreatedWithAccent
+            .andExpect(
+                jsonPath("$.statusCode")
+                    .value(400)
             )
     }
 

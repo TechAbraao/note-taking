@@ -8,6 +8,7 @@ import dev.himanshu.noteTaking.exceptions.NoteTitleAlreadyExistsException
 import dev.himanshu.noteTaking.mappers.NoteMapper
 import dev.himanshu.noteTaking.repository.NoteRepository
 import dev.himanshu.noteTaking.repository.TagRepository
+import dev.himanshu.noteTaking.utils.Priority
 import jakarta.transaction.Transactional
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -93,14 +94,30 @@ class NoteServices(
 
     @Transactional
     fun update(id: UUID, request: NoteRequest): NoteDTO? {
-        val entity = noteRepository.findByIdOrNull(id) ?: return null
+        val entity = noteRepository.findByIdOrNull(id)
+            ?: return null
+
+        val existingTags = request.tags
+            .mapNotNull { tagName -> tagRepository.findByName(tagName) }
+            .toMutableSet()
+
+        val newTags = request.tags
+            .filter { tagRepository.findByName(it) == null }
+            .map { tagName ->
+                val formatted = tagName.replaceFirstChar { it.uppercase() }
+                tagRepository.save(TagEntity(name = formatted))
+            }
+
+        val allTags = existingTags + newTags
 
         val updatedEntity = entity.copy(
             title = request.title,
             description = request.description,
-            priority = request.priority
+            priority = request.priority,
         )
 
+        updatedEntity.tags.clear()
+        updatedEntity.tags.addAll(allTags)
         val saved = noteRepository.save(updatedEntity)
 
         return NoteDTO(
@@ -111,5 +128,4 @@ class NoteServices(
             tags = saved.tags
         )
     }
-
 }

@@ -2,7 +2,6 @@ package dev.himanshu.noteTaking.controllers
 
 import dev.himanshu.noteTaking.dto.NoteDTO
 import dev.himanshu.noteTaking.dto.request.NoteRequest
-import dev.himanshu.noteTaking.entities.NoteEntity
 import dev.himanshu.noteTaking.services.NoteServices
 import dev.himanshu.noteTaking.utils.ApiResponse
 import jakarta.validation.Valid
@@ -40,7 +39,6 @@ class NoteController(
                     )
                 )
         }
-
         return ResponseEntity
             .status(HttpStatus.OK)
             .body(
@@ -53,7 +51,9 @@ class NoteController(
     }
 
     @GetMapping("/{id}")
-    fun getNoteById(@PathVariable("id") id: UUID): ResponseEntity<ApiResponse<NoteDTO>> {
+    fun getNoteById(
+        @PathVariable("id") id: UUID
+    ): ResponseEntity<ApiResponse<NoteDTO>> {
         val note: NoteDTO = noteServices.findById(id = id)
             ?: return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -76,7 +76,9 @@ class NoteController(
     }
 
     @PostMapping
-    fun postNote(@Valid @RequestBody request: NoteRequest): ResponseEntity<ApiResponse<NoteDTO>> {
+    fun postNote(
+        @Valid @RequestBody request: NoteRequest
+    ): ResponseEntity<ApiResponse<NoteDTO>> {
         val createdNote: NoteDTO = noteServices.create(request) ?: return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(
@@ -98,7 +100,9 @@ class NoteController(
     }
 
     @DeleteMapping("/{id}")
-    fun deleteNote(@PathVariable id: UUID): ResponseEntity<ApiResponse<Unit>> {
+    fun deleteNote(
+        @PathVariable id: UUID
+    ): ResponseEntity<ApiResponse<Unit>> {
         val deleted = noteServices.deleteById(id)
 
         return if (deleted)
@@ -117,7 +121,7 @@ class NoteController(
     @PutMapping("/{id}")
     fun updateNote(
         @PathVariable id: UUID,
-        @RequestBody request: NoteRequest
+        @Valid @RequestBody request: NoteRequest
     ): ResponseEntity<ApiResponse<NoteDTO>> {
 
         val updated = noteServices.update(id, request)

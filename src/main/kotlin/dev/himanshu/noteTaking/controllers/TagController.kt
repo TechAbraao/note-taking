@@ -39,7 +39,9 @@ class TagController(
     }
 
     @PostMapping
-    fun postTag(@Valid @RequestBody request: TagRequest): ResponseEntity<ApiResponse<TagDTO>> {
+    fun postTag(
+        @Valid @RequestBody request: TagRequest
+    ): ResponseEntity<ApiResponse<TagDTO>> {
         val savedTag = tagServices.create(request = request)
         return ResponseEntity
             .status(HttpStatus.CREATED)
@@ -53,7 +55,9 @@ class TagController(
     }
 
     @DeleteMapping("/{name}")
-    fun deleteByName(@PathVariable name: String): ResponseEntity<ApiResponse<Unit>> {
+    fun deleteByName(
+        @PathVariable name: String
+    ): ResponseEntity<ApiResponse<Unit>> {
         val tagDeletedByName = tagServices.deleteByName(name)
 
         if (!tagDeletedByName) {
@@ -74,7 +78,17 @@ class TagController(
     }
 
     @PutMapping("/{name}")
-    fun changeTagByName(@PathVariable name: String): ResponseEntity<ApiResponse<Unit>> {
-        TODO(reason = "Not implemented yet.")
+    fun updateTagByName(
+        @PathVariable name: String,
+        @Valid @RequestBody request: TagRequest
+    ): ResponseEntity<ApiResponse<TagDTO>> {
+        val updatedTag = tagServices.updateName(name, request.name)
+
+        val response = ApiResponse(
+            statusCode = 200,
+            message = "Tag updated successfully.",
+            data = updatedTag
+        )
+        return ResponseEntity.ok(response)
     }
 }

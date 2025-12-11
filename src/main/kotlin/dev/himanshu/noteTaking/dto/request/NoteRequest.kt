@@ -1,7 +1,5 @@
 package dev.himanshu.noteTaking.dto.request
 
-import dev.himanshu.noteTaking.dto.NoteDTO
-import dev.himanshu.noteTaking.entities.NoteEntity
 import dev.himanshu.noteTaking.utils.Priority
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
@@ -22,20 +20,4 @@ data class NoteRequest(
 
     @field:Size(min = 1, message = "Tags list cannot be empty.")
     val tags: List<String>,
-
-    ) {
-    fun toEntity(): NoteEntity = NoteEntity(
-        title = title,
-        description = description,
-        priority = priority
-    )
-    fun toDTO(noteEntity: NoteEntity): NoteDTO {
-        return NoteDTO(
-            id = noteEntity.id,
-            title = noteEntity.title,
-            description = noteEntity.description,
-            priority = noteEntity.priority,
-            tags = noteEntity.tags,
-        )
-    }
-}
+)

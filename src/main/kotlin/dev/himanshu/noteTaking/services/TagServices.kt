@@ -2,6 +2,7 @@ package dev.himanshu.noteTaking.services
 
 import dev.himanshu.noteTaking.dto.TagDTO
 import dev.himanshu.noteTaking.dto.request.TagRequest
+import dev.himanshu.noteTaking.entities.TagEntity
 import dev.himanshu.noteTaking.exceptions.TagAlreadyExistsException
 import dev.himanshu.noteTaking.exceptions.TagNotFoundException
 import dev.himanshu.noteTaking.mappers.TagMapper
@@ -58,7 +59,21 @@ class TagServices (
     }
 
     @Transactional
-    fun changeByName(name: String) {
-        var formattedName = name.replaceFirstChar { it.uppercase() }
+    fun updateName(oldName: String, newName: String): TagDTO {
+        val oldFormatted = oldName.replaceFirstChar { it.uppercase() }
+        val newFormatted = newName.replaceFirstChar { it.uppercase() }
+
+        val entity = tagRepository.findByName(oldFormatted)
+            ?: throw TagNotFoundException("Tag '$oldFormatted' not found.")
+
+        if (tagRepository.findByName(newFormatted) != null) {
+            throw TagAlreadyExistsException("Tag '$newFormatted' already exists.")
+        }
+
+        val updated = entity.copy(name = newFormatted)
+        val saved = tagRepository.save(updated)
+
+        return TagDTO(saved.id, saved.name)
     }
+
 }
